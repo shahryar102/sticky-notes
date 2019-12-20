@@ -15,10 +15,16 @@ class App extends Component {
       notes: [],
       note: {},
       newTag: false,
-      error: ''
+      error: '',
+      data:[]
     };
   }
-
+  async componentDidMount(){    
+    let self = this;
+    setInterval(function(){ 
+      self.getData()
+    },2000)
+  }
   toggleNote = () => {
     this.setState({
       showNote: ! this.state.showNote,
@@ -86,6 +92,11 @@ class App extends Component {
       }
     });
   }
+  getData = async() => {
+    let articles = await axios.get('https://ny-article-search.herokuapp.com/api/articles')
+    console.log(articles)
+    this.setState({data:articles.data})
+  }
 
   deleteTag = (noteId, id) => {
     axios.delete(urlFor(`/tags/${id}`))
@@ -95,6 +106,12 @@ class App extends Component {
 
   resetError = () => {
     this.setState({ error: '' });
+  }
+
+  showData = () => {
+    return this.state.data.map(eachThing => {
+      return <li>{eachThing.title}</li>
+    })
   }
 
   render() {
@@ -122,9 +139,13 @@ class App extends Component {
               getNote={this.getNote}
               deleteNote={this.deleteNote}
             /> }
+            {this.showData()}
       </div>
     );
   }
 }
 
 export default App;
+
+
+
